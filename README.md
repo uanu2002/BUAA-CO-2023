@@ -33,11 +33,11 @@ Pre部分的代码、一些安装包、工具、资料等
 
 课下：CRC校验、4-bit ALU、实现GRF、正则表达式匹配（FSM）
 
-课上：
+课上：Interview、位扩展、21点简化版
 
 ## P4 Logisim单周期CPU
 
-课下：
+课下：单周期CPU：支持**addu, subu, ori, lw, sw, beq, lui, nop，jal**
 
 课上：
 
