@@ -39,7 +39,7 @@ Pre部分的代码、一些安装包、工具、资料等
 
 课下：单周期CPU：支持**addu, subu, ori, lw, sw, beq, lui, nop，jal**
 
-课上：
+课上：添加指令：**xori, jalr, lb**
 
 ## P5 Logisim流水线CPU
 

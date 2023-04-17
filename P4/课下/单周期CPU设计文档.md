@@ -8,12 +8,10 @@
 >
 >   
 >
->   待添加：j/slt/sllv/sraw/srlv/slti/addiu/sra/srl/addi/blez/sh/lw/lh/lhu
->
->   addu, subu, and, or, sll, sllv, slt, jr / addi, ori, lui, slti / beq, blez / j, jal / sw, sh / lw, lh, lhu
->
 >   
->   待完成：测试方案，python生成样例，根据指令组成部分生成，例如imm16，生成所有的极限值。
+>
+>   addu/subu, and/or, sll/sllv/slt, jr, addi/ori/lui, slti, beq/blez, j/jal, sw/sh, lw/lh/lhu
+>
 
 
 
@@ -22,9 +20,10 @@
 | Load | Save | Cal_r | Cal_i(16位imm) | B_type | J_Type | Shamt(5位imm) | Other |
 | ---- | ---- | ----- | -------------- | ------ | ------ | ------------- | ----- |
 | lw   | sw   | addu  | ori            | beq    | jal    | sll           | lui   |
-|      |      | subu  |                |        | jr     |               |       |
-|      |      | and   |                |        |        |               |       |
-|      |      | or    |                |        |        |               |       |
+| lh   | sh   | subu  |                |        | jr     |               |       |
+| lhu  | sb   | and   |                |        |        |               |       |
+| lb   |      | or    |                |        |        |               |       |
+| lbu  |      | sllv  |                |        |        |               |       |
 |      |      |       |                |        |        |               |       |
 
 
@@ -63,7 +62,7 @@
 | 读存储器 | DM   | Address | ALUResult | ALUResult | /         | /         | /      | / | /    | /     | / |      |      | ALUResult        |
 |          |      | WD      | /         | RD2       | /         | /         | /      | / | /    | /     | / |      |      | RD2              |
 |          |      |         |           |           |           |           |        |       |       |       |      |      |      |                  |
-| 回写     | RF   | A3      | rt        | /         | rd        | rt        | /      | rd | rt | ra |/|||A3 rt rd ra|
+| 回写     | RF   | A3      | rt        | /         | rd        | rt        | /      | rd | rt | ra |/|||rt rd ra|
 |          |      | WD      | RD        | /         | ALUResult | ALUResult | /      | ALUResult | ALUResult | PC4   | / |      |      | RD ALUResult PC4 |
 |          |      |         |           |           |           |           |        |       |       |       |      |      |      |                  |
 
@@ -71,23 +70,30 @@
 
 ### 控制器设计
 
-| 指令 | ALUControl | NPCSel  | WDSel | A3Sel | ALUSrcBSel | EXTOp | DMWr | !RFWr |
-| ---- | ---------- | ------- | ----- | ----- | ---------- | ----- | ---- | ----- |
-| addu | 0000       | 000     | 00    | 00    | 00         | /     | 0    | 0     |
-| subu | 0001       | 000     | 00    | 00    | 00         | /     | 0    | 0     |
-| ori  | 0010       | 000     | 00    | 01    | 01         | 0     | 0    | 0     |
-| lw   | 0000       | 000     | 01    | 01    | 01         | 0     | 0    | 0     |
-| sw   | 0000       | 000     | /     | /     | 01         | 0     | 1    | 1     |
-| beq  | 0001       | 000/001 | /     | /     | 00         | 0     | 0    | 1     |
-| jal  | /          | 010     | 10    | 10    | /          | 0     | 0    | 0     |
-| lui  | 0100       | 000     | 00    | 01    | 01         | 0     | 0    | 0     |
-| and  | 0011       | 000     | 00    | 00    | 00         | /     | 0    | 0     |
-| or   | 0010       | 000     | 00    | 00    | 00         | /     | 0    | 0     |
-| jr   | /          | 011     | /     | /     | /          | /     | /    | 1     |
-| sll  | 0101       | 000     | 00    | 00    | 00         | /     | /    | 0     |
-|      |            |         |       |       |            |       |      |       |
-| nop  | /          | 000     | /     | /     | /          | /     | /    | /     |
-|      |            |         |       |       |            |       |      |       |
+| 指令 | ALUControl | NPCSel  | WDSel | A3Sel | ALUSrcBSel | EXTOp | DMWr | !RFWr | DataType |
+| ---- | ---------- | ------- | ----- | ----- | ---------- | ----- | ---- | ----- | -------- |
+| addu | 0000       | 000     | 00    | 00    | 00         | /     | 0    | 0     | 000      |
+| subu | 0001       | 000     | 00    | 00    | 00         | /     | 0    | 0     | 000      |
+| ori  | 0010       | 000     | 00    | 01    | 01         | 0     | 0    | 0     | 000      |
+| lw   | 0000       | 000     | 01    | 01    | 01         | 1     | /    | 0     | 000      |
+| sw   | 0000       | 000     | /     | /     | 01         | 1     | 1    | 1     | 000      |
+| beq  | 0001       | 000/001 | /     | /     | 00         | 1     | 0    | 1     | 000      |
+| jal  | /          | 010     | 10    | 10    | /          | /     | 0    | 0     | 000      |
+| lui  | 0100       | 000     | 00    | 01    | 01         | 0     | 0    | 0     | 000      |
+| and  | 0011       | 000     | 00    | 00    | 00         | /     | 0    | 0     | 000      |
+| or   | 0010       | 000     | 00    | 00    | 00         | /     | 0    | 0     | 000      |
+| jr   | /          | 011     | /     | /     | /          | /     | /    | 1     | 000      |
+| sll  | 0101       | 000     | 00    | 00    | 00         | /     | /    | 0     | 000      |
+| sllv | 0110       | 000     | 00    | 00    | 00         | /     | /    | 0     | 000      |
+| lh   | 0000       | 000     | 01    | 01    | 01         | 1     | /    | 0     | 001      |
+| lhu  | 0000       | 000     | 01    | 01    | 01         | 1     | /    | 0     | 010      |
+| lb   | 0000       | 000     | 01    | 01    | 01         | 1     | /    | 0     | 011      |
+| lbu  | 0000       | 000     | 01    | 01    | 01         | 1     | /    | 0     | 100      |
+| sh   | 0000       | 000     | /     | /     | 01         | 1     | 1    | 1     | 001      |
+| sb   | 0000       | 000     | /     | /     | 01         | 1     | 1    | 1     | 010      |
+|      |            |         |       |       |            |       |      |       |          |
+| nop  | /          | 000     | /     | /     | /          | /     | /    | /     |          |
+|      |            |         |       |       |            |       |      |       |          |
 
 
 
@@ -299,9 +305,43 @@
 
 ## 三、测试方案
 
+评测方案：python生成MIPS代码 + 自动对拍测试
 
+*   python生成MIPS代码：
 
+    对每条指令进行覆盖率测试，覆盖所有寄存器、边缘极值等。
 
+    ```python
+    import random
+    
+    for i in range(10):
+    	imm =  random.randint(0,1000)
+    	imm = imm * 2
+    	print("ori ${}, $0, {}" .format(i, imm))
+    
+    for i in range(10):
+    	imm =  random.randint(0,20)
+    
+    	if i % 2:
+    		imm = imm * 2
+    		print("sh ${}, {}($0)" .format(i, imm))
+    	else:
+    		imm = imm * 1
+    		print("sb ${}, {}($0)".format(i, imm))
+    
+    for i in range(10):
+    	imm =  random.randint(0,20)
+    	if i % 2:
+    		imm = imm * 1
+    		print("lbu ${}, {}($0)" .format(i, imm))
+    	else:
+    		imm = imm * 2
+    		print("lhu ${}, {}($0)".format(i, imm))
+    ```
+
+*   自动对拍测试：[uanu2002/BUAA-CO-CPU-Judge](https://github.com/uanu2002/BUAA-CO-CPU-Judge)
+
+    调用Mars编译MIPS代码，并将结果载入值Logisim电路中的ROM，分别单步运行MIPS和Logisim，并对单步输出（GRF和DM操作、输出引脚）进行记录，运行结束后对输出进行对拍。
 
 
 
