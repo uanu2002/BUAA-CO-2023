@@ -43,15 +43,15 @@ Pre部分的代码、一些安装包、工具、资料等
 
 ## P5 Logisim流水线CPU
 
-课下：
+课下：（伪）流水线CPU：支持**addu, subu, ori, lw, sw, beq, lui, nop, jal, jr, j**
 
-课上：
+课上：课下强测+添加指令：**bne, lhu**
 
 ## P6 Cache模拟
 
-课下：
+课下：Python模拟Cache：修改静态参数和替换策略
 
-课上：
+课上：Cache、虚拟内存相关选择填空题
 
 
 

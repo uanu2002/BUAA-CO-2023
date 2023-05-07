@@ -1,0 +1,46 @@
+44,46d43
+<     if data[2] == 0:
+<         return
+<     data = data[0]
+63c60,61
+<     index = list(cache.keys())[0]
+---
+>     from random import choice
+>     index = choice(list(cache.keys()))
+86,89c84
+<         cache[index] = [block, 0, 0]
+<     else:
+<         value = cache.pop(index)
+<         cache[index] = value
+---
+>         cache[index] = block
+91c86
+<     x = cache[index][0][offset]
+---
+>     x = cache[index][offset]
+106,109c101
+<         cache[index] = [block, 0, 0]
+<     else:
+<         value = cache.pop(index)
+<         cache[index] = value
+---
+>         cache[index] = block
+111,112c103
+<     cache[index][0][offset] = data
+<     cache[index][2] = 1
+---
+>     cache[index][offset] = data
+131,136c122,127
+<     for i in range(in_channels):
+<         for j in range(out_channels):
+<             for h in range(r_size):
+<                 for w in range(r_size):
+<                     for H in range(kernel_size):
+<                         for W in range(kernel_size):
+---
+>     for h in range(r_size):
+>         for w in range(r_size):
+>             for H in range(kernel_size):
+>                 for W in range(kernel_size):
+>                     for i in range(in_channels):
+>                         for j in range(out_channels):

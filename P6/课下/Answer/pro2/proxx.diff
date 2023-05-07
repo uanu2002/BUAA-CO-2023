@@ -1,0 +1,20 @@
+61,63c61
+<     # index = choice(list(cache.keys()))
+<     # 使用FIFO策略
+<     index = list(cache.keys())[0]
+---
+>     index = choice(list(cache.keys()))
+124,129c122,127
+<     for i in range(in_channels):
+<         for j in range(out_channels):
+<             for h in range(r_size):
+<                 for w in range(r_size):
+<                     for H in range(kernel_size):
+<                         for W in range(kernel_size):
+---
+>     for h in range(r_size):
+>         for w in range(r_size):
+>             for H in range(kernel_size):
+>                 for W in range(kernel_size):
+>                     for i in range(in_channels):
+>                         for j in range(out_channels):
